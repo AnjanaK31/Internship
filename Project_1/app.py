@@ -1,48 +1,99 @@
 import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
 
-file_path = 'Attrition data.csv' 
+# Load the dataset
+file_path = 'Attrition data.csv'  # Ensure this path is correct
 data = pd.read_csv(file_path)
 
+# Initialize the Dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-app.layout = dbc.Container([
+# Function to create all figures
+def create_figures(data):
+    figures = {}
+    
+    # Plot the distribution of attrition
+    figures['attrition_fig'] = px.histogram(data, x='Attrition', title='Attrition Distribution')
+    
+    # Plot attrition by department
+    figures['department_attrition_fig'] = px.histogram(data, x='Department', color='Attrition', barmode='group', 
+                                                       title='Attrition Rate by Department')
+    
+    # Plot attrition by job role
+    figures['job_role_attrition_fig'] = px.histogram(data, x='JobRole', color='Attrition', barmode='group', 
+                                                     title='Attrition Rate by Job Role')
+    
+    # Plot monthly income distribution by attrition
+    figures['income_attrition_fig'] = px.box(data, x='Attrition', y='MonthlyIncome', color='Attrition', 
+                                             title='Monthly Income Distribution by Attrition')
+    
+    # Plot attrition by overtime (ensure correct column name)
+    if 'OverTime' in data.columns:
+        figures['overtime_attrition_fig'] = px.histogram(data, x='OverTime', color='Attrition', barmode='group', 
+                                                         title='Attrition by Overtime')
+    
+    # Plot attrition by business travel
+    figures['travel_attrition_fig'] = px.histogram(data, x='BusinessTravel', color='Attrition', barmode='group', 
+                                                   title='Attrition by Business Travel')
+    
+    # Plot years at company vs. attrition
+    figures['tenure_attrition_fig'] = px.histogram(data, x='YearsAtCompany', color='Attrition', barmode='group', 
+                                                   title='Years at Company vs. Attrition')
+    
+    # Plot the correlation heatmap
+    numeric_data = data.select_dtypes(include=['float64', 'int64'])
+    correlation_matrix = numeric_data.corr()
+    figures['correlation_heatmap'] = px.imshow(correlation_matrix, text_auto=True, 
+                                               title='Correlation Heatmap', aspect='auto', 
+                                               color_continuous_scale='Viridis')  # Using a valid colorscale
+    return figures
+
+figures = create_figures(data)
+
+# Define the layout of the dashboard
+layout_children = [
     dbc.Row([
         dbc.Col(html.H1('Employee Attrition Dashboard'), className='mb-2')
     ]),
     dbc.Row([
-        dbc.Col(dcc.Graph(id='attrition-graph'), className='mb-4')
+        dbc.Col(dcc.Graph(figure=figures['attrition_fig']), className='mb-4')
     ]),
     dbc.Row([
-        dbc.Col(dcc.Dropdown(id='department-dropdown', options=[
-            {'label': department, 'value': department} for department in data['Department'].unique()
-        ], placeholder='Select a Department'), className='mb-4')
+        dbc.Col(dcc.Graph(figure=figures['department_attrition_fig']), className='mb-4')
     ]),
     dbc.Row([
-        dbc.Col(dcc.Graph(id='department-attrition-graph'), className='mb-4')
+        dbc.Col(dcc.Graph(figure=figures['job_role_attrition_fig']), className='mb-4')
+    ]),
+    dbc.Row([
+        dbc.Col(dcc.Graph(figure=figures['income_attrition_fig']), className='mb-4')
+    ]),
+]
+
+# Check if 'overtime_attrition_fig' exists before adding it to the layout
+if 'overtime_attrition_fig' in figures:
+    layout_children.append(
+        dbc.Row([
+            dbc.Col(dcc.Graph(figure=figures['overtime_attrition_fig']), className='mb-4')
+        ])
+    )
+
+layout_children.extend([
+    dbc.Row([
+        dbc.Col(dcc.Graph(figure=figures['travel_attrition_fig']), className='mb-4')
+    ]),
+    dbc.Row([
+        dbc.Col(dcc.Graph(figure=figures['tenure_attrition_fig']), className='mb-4')
+    ]),
+    dbc.Row([
+        dbc.Col(dcc.Graph(figure=figures['correlation_heatmap']), className='mb-4')
     ])
 ])
 
-@app.callback(
-    Output('attrition-graph', 'figure'),
-    Output('department-attrition-graph', 'figure'),
-    Input('department-dropdown', 'value')
-)
-def update_graph(selected_department):
-    attrition_fig = px.histogram(data, x='Attrition', title='Attrition Distribution')
-    if selected_department:
-        dept_data = data[data['Department'] == selected_department]
-    else:
-        dept_data = data
+app.layout = dbc.Container(layout_children)
 
-    department_attrition_fig = px.histogram(dept_data, x='Department', color='Attrition', barmode='group', 
-    title=f'Attrition Rate by Department: {selected_department if selected_department else "All"}')
-
-    return attrition_fig, department_attrition_fig
-
+# Run the app
 if __name__ == '__main__':
-    print("Dash app running at http://127.0.0.1:8050/")
+    app.run_server(debug=True)
