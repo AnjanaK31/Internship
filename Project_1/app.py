@@ -5,7 +5,7 @@ import plotly.express as px
 import pandas as pd
 
 # Load the dataset
-file_path = 'Attrition data.csv'  # Ensure this path is correct
+file_path = 'Attrition data.csv' 
 data = pd.read_csv(file_path)
 
 # Initialize the Dash app
@@ -52,8 +52,6 @@ def create_figures(data):
     return figures
 
 figures = create_figures(data)
-
-# Define the layout of the dashboard
 layout_children = [
     dbc.Row([
         dbc.Col(html.H1('Employee Attrition Dashboard'), className='mb-2')
@@ -71,8 +69,6 @@ layout_children = [
         dbc.Col(dcc.Graph(figure=figures['income_attrition_fig']), className='mb-4')
     ]),
 ]
-
-# Check if 'overtime_attrition_fig' exists before adding it to the layout
 if 'overtime_attrition_fig' in figures:
     layout_children.append(
         dbc.Row([
