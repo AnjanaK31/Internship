@@ -30,7 +30,7 @@ def create_figures(data):
     figures['income_attrition_fig'] = px.box(data, x='Attrition', y='MonthlyIncome', color='Attrition', 
                                              title='Monthly Income Distribution by Attrition')
     
-    # Plot attrition by overtime (ensure correct column name)
+    # Plot attrition by overtime 
     if 'OverTime' in data.columns:
         figures['overtime_attrition_fig'] = px.histogram(data, x='OverTime', color='Attrition', barmode='group', 
                                                          title='Attrition by Overtime')
