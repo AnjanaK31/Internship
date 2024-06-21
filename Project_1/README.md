@@ -1,7 +1,7 @@
 This is my first project as part of my internship at Unified Mentor.
-Employee Attrition DashboardEmployee Attrition Dashboard
-
+Employee Attrition Dashboard
 Associated with Unified Mentor
+
 Employee Attrition Dashboard – Data Analysis Internship Project 
 
 
