@@ -24,4 +24,4 @@ Key Features:
 3) Data-Driven Insights: Helps in identifying patterns and factors contributing to employee attrition, facilitating strategic decision-making.
 4) Robust and Scalable: Built with a focus on clean, maintainable code and scalability for future enhancements.
 
-This project was a fantastic opportunity to apply my analytical skills in a practical setting. I’m grateful to Unified Mentor for this learning experience!
+This project was a fantastic opportunity to apply my analytical skills in a practical setting. 
